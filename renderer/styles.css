@@ -1,0 +1,44 @@
+@import url('https://fonts.googleapis.com/css?family=Sulphur+Point&display=swap');
+
+
+html, body, #__next {
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  height: 100%;
+}
+
+*,
+*::after,
+*::before {
+	box-sizing: border-box;
+}
+
+:root {
+  font-size: 20px;
+}
+
+::selection {
+  background: #2ddab8;
+  color: white;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background: #0c0f13;
+  overflow: hidden;
+  font-family: sans-serif;
+  color: #8b8b8b;
+  font-size: 0.9rem;
+}
+
+a {
+  color: #545454;
+  text-decoration: none;
+}
+
+a:focus,
+a:hover {
+  color: #8b8b8b;
+}
