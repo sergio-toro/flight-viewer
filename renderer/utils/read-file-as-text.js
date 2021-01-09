@@ -11,6 +11,7 @@ export default function readFileAsText(file/*: File */)/*: Promise<string[]> */ 
     };
     // Make sure to handle error states
     reader.onerror = function (e) {
+      console.log('readFileAsText', e)
       reject(e);
     };
     reader.readAsText(file);

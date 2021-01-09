@@ -14,7 +14,11 @@ const HiddenInput = styled.input`
 // };
 
 const FilePicker = ({
-  className, label, accept, onChange,
+  className, 
+  label,
+  accept,
+  onChange,
+  ...props
 }) => (
   <>
     <HiddenInput
@@ -22,6 +26,7 @@ const FilePicker = ({
       id="outlined-button-file"
       type="file"
       onChange={onChange}
+      {...props}
     />
     <label htmlFor="outlined-button-file">
       <Button className={className} color="primary" variant="outlined" component="span">

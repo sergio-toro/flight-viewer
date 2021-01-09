@@ -7,26 +7,28 @@ import TrackCard from '../components/TrackCard';
 export default function Home() {
   const trackListRef = useRef({});
   const [tracks, setTracks] = useState([]);
+
   return (
     <>
       <TrackPicker
-        onChange={({
-          track, date, duration, ...rest
-        }) => {
-          const trackId = `${date}-${duration}`;
-          trackListRef.current[trackId] = {
-            trackId, track, date, duration,
-          };
-
-          setTracks([...tracks, trackId]);
-          // console.log('hello world track', { track, date, duration, rest });
+        onChange={(parsedTracks) => {
+          parsedTracks.forEach((track) => {
+            trackListRef.current[track.trackId] = track;
+          });
+          
+          setTracks([...tracks, ...parsedTracks.map(({ trackId }) => trackId)]);
         }}
       />
 
       {tracks && tracks.map((trackId) => {
         const item = trackListRef.current[trackId];
         return (
-          <TrackCard date={item.date} track={item.track} />
+          <TrackCard 
+            key={trackId}
+            date={item.date}
+            duration={item.duration}
+            track={item.track}
+          />
         );
       })}
     </>

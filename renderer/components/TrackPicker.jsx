@@ -23,16 +23,42 @@ const CloudUploadIcon = styled(BaseCloudUploadIcon)`
 //   className: string
 // };
 
+function parseFiles(files) {
+  return Array.from(files).map(async (file) => {
+    try {
+      const content = await readFileAsText(file);
+
+      const track = content.join('\n');
+      const parsedTrack = IGCParser.parse(track);
+
+      const startTimestamp = parsedTrack.fixes[0].timestamp;
+      const endTimestamp = parsedTrack.fixes[parsedTrack.fixes.length - 1].timestamp;
+
+      return {
+        trackId: file.name,
+        track: parsedTrack,
+        date: parsedTrack.date,
+        duration: (endTimestamp - startTimestamp) / 1000,
+      };
+    } 
+    catch(error) {
+      console.error(`FAILED to parse file ${file.name}`, error, file);
+      return undefined;
+    }
+  });
+}
+
 const TrackSelector = ({ className, onChange }) => (
   <FilePicker
     className={className}
     accept=".igc"
+    multiple
     label={(
       <>
         Upload IGC Track
         <CloudUploadIcon />
       </>
-      )}
+    )}
     onChange={async (event) => {
       if (!event.target.files.length) {
         return;
@@ -41,26 +67,14 @@ const TrackSelector = ({ className, onChange }) => (
         // Allow async access to the event
         event.persist();
 
-        const file = event.target.files[0];
-        const content = await readFileAsText(file);
-
-        const track = content.join('\n');
-        const parsedTrack = IGCParser.parse(track);
-
-        const startTimestamp = parsedTrack.fixes[0].timestamp;
-        const endTimestamp = parsedTrack.fixes[parsedTrack.fixes.length - 1].timestamp;
+        const files = await Promise.all(parseFiles(event.target.files));
 
         // Clear file
         event.target.value = '';
 
-        onChange({
-          track,
-          parsedTrack,
-          date: parsedTrack.date,
-          duration: (endTimestamp - startTimestamp) / 1000,
-        });
+        onChange(files.filter(Boolean)); // remove failed files
       } catch (error) {
-        console.error('Failed to parse file.');
+        console.error('Failed to parse file.', error);
       }
     }}
   />
