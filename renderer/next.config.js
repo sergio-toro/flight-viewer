@@ -1,8 +1,8 @@
-const withTM = require('next-transpile-modules')([
-  'drei',
-  'three',
-  'postprocessing',
-  'react-three-fiber',
-]);
+// const withTM = require('next-transpile-modules')([
+//   'postprocessing',
+// ]);
+// module.exports = withTM();
 
-module.exports = withTM();
+module.exports = {
+  /* config options here */
+};
