@@ -1,7 +1,7 @@
 {
 	"name": "flight-viewer",
 	"productName": "Pargliding Flight Viewer",
-	"version": "1.0.0",
+	"version": "1.1.0",
 	"main": "main/index.js",
 	"scripts": {
 		"clean": "rimraf dist renderer/.next renderer/out",
