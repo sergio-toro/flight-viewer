@@ -16,6 +16,8 @@ export default function useMap(
   options,
   initialOptions = defaultInitialOptions,
 )/* : [{ current: L.map }]  */ {
+
+  console.log('USE_MAP MAP_TILER_KEY', { MAP_TILER_KEY });
   const mapRef = useRef();
 
   useEffect(() => {
