@@ -6,6 +6,10 @@ import useFitBounds from '../hooks/map/use-fit-bounds';
 // import useRenderLaunches from '../hooks/map/useRenderLaunches';
 // import useRenderLandings from '../hooks/map/useRenderLandings';
 import useRenderPolyline from '../hooks/map/use-render-polyline';
+import useRenderMarker from '../hooks/map/use-render-marker';
+
+import DefaultIcon from './map-icons/DefaultIcon';
+import LandingIcon from './map-icons/LandingIcon';
 
 import BaseMap from './BaseMap';
 
@@ -57,20 +61,6 @@ const TrackMap = ({
     });
   }, [JSON.stringify(gpsTrack)]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // useRenderLaunches(
-  //   mapRef,
-  //   onLaunchChange,
-  //   selectedLaunchId,
-  //   launch,
-  //   nearLaunches
-  // );
-  // useRenderLandings(
-  //   mapRef,
-  //   onLandingChange,
-  //   selectedLandingId,
-  //   landing,
-  //   nearLandings
-  // );
   useFitBounds(
     mapRef,
     // launch,
@@ -80,6 +70,8 @@ const TrackMap = ({
     flightTrack,
   );
   useRenderPolyline(mapRef, flightTrack);
+  useRenderMarker(mapRef, flightTrack[0], DefaultIcon, 'Launch');
+  useRenderMarker(mapRef, flightTrack[flightTrack.length - 1], LandingIcon, 'Landing');
 
   return (
     <MapContainer
