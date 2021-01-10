@@ -1,16 +1,29 @@
-import React, { Fragment } from 'react';
-import IGCParser from 'igc-parser';
+import React, { Fragment, useCallback, useState } from 'react';
 import styled from 'styled-components';
+
+import { useTheme } from '@material-ui/core/styles';
 import { CloudUploadOutlined as BaseCloudUploadIcon } from '@material-ui/icons';
+import Typography from '@material-ui/core/Typography';
 
-import readFileAsText from '../utils/read-file-as-text';
-
-import FilePicker from './FilePicker';
+import parseTrackFiles from '../utils/parse-track-files';
+import BaseFilePicker from './FilePicker';
 
 const CloudUploadIcon = styled(BaseCloudUploadIcon)`
   margin-left: 10px;
 `;
 
+const DropZone = styled.div`
+  width: 100%;
+  padding: ${({ isDropActive }) => isDropActive ? '50px 15px' : '15px'};
+  text-align: center;
+  border: 3px dashed ${({ theme }) => theme.palette.grey["500"]};
+
+  background: ${({ isDropActive, theme }) => isDropActive ? theme.palette.action.hover : 'none'}
+`;
+
+const FilePicker = styled(BaseFilePicker)`
+  margin-top: 15px;
+`;
 // type TrackShape = {
 //   track: string,
 //   parsedTrack: any,
@@ -23,62 +36,84 @@ const CloudUploadIcon = styled(BaseCloudUploadIcon)`
 //   className: string
 // };
 
-function parseFiles(files) {
-  return Array.from(files).map(async (file) => {
+const TrackSelector = ({ className, onChange }) => {
+  const theme = useTheme();
+  const [isDropActive, setIsDropActive] = useState(false);
+  const handleDropFiles = useCallback(async (event) => {
+    event.preventDefault();
+    setIsDropActive(false);
     try {
-      const content = await readFileAsText(file);
+      event.persist();
 
-      const track = content.join('\n');
-      const parsedTrack = IGCParser.parse(track);
-
-      const startTimestamp = parsedTrack.fixes[0].timestamp;
-      const endTimestamp = parsedTrack.fixes[parsedTrack.fixes.length - 1].timestamp;
-
-      return {
-        trackId: file.name,
-        track: parsedTrack,
-        date: parsedTrack.date,
-        duration: (endTimestamp - startTimestamp) / 1000,
-      };
-    }
-    catch(error) {
-      console.error(`FAILED to parse file ${file.name}`, error, file);
-      return undefined;
-    }
-  });
-}
-
-const TrackSelector = ({ className, onChange }) => (
-  <FilePicker
-    className={className}
-    accept=".igc"
-    multiple
-    label={(
-      <>
-        Upload IGC Track
-        <CloudUploadIcon />
-      </>
-    )}
-    onChange={async (event) => {
-      if (!event.target.files.length) {
-        return;
+      const filesToParse = [];
+      for (let i = 0; i < event.dataTransfer.items.length; i++) {
+        const item = event.dataTransfer.items[i];
+        if (item.kind !== 'file') {
+          continue;
+        }
+        const file = item.getAsFile();
+        if (!file.name.toLowerCase().includes('.igc')) {
+          continue;
+        }
+        filesToParse.push(file);
       }
-      try {
-        // Allow async access to the event
-        event.persist();
 
-        const files = await Promise.all(parseFiles(event.target.files));
+      const files = await Promise.all(parseTrackFiles(filesToParse));
+      onChange(files.filter(Boolean)); // remove failed files
+    } catch(error) {
+      console.error('Failed to parse dropped files.', error);
+    }
+  }, [onChange, setIsDropActive]);
 
-        // Clear file
-        event.target.value = '';
+  const handleFilePicker = useCallback(async (event) => {
+    if (!event.target.files.length) {
+      return;
+    }
+    try {
+      // Allow async access to the event
+      event.persist();
 
-        onChange(files.filter(Boolean)); // remove failed files
-      } catch (error) {
-        console.error('Failed to parse file.', error);
-      }
-    }}
-  />
-);
+      const files = await Promise.all(parseTrackFiles(event.target.files));
+      event.target.value = '';
+      onChange(files.filter(Boolean)); // remove failed files
+    } catch (error) {
+      console.error('Failed to parse file.', error);
+    }
+  }, [onChange]);
+
+  const pointerEventsStyle = {
+    pointerEvents: isDropActive ? 'none' : 'all',
+  };
+  return (
+    <DropZone
+      theme={theme}
+      className={className}
+      isDropActive={isDropActive}
+      onDrop={handleDropFiles}
+      onDragOver={(event) => {
+        event.preventDefault();
+      }}
+      onDragEnter={() => setIsDropActive(true)}
+      onDragLeave={() => setIsDropActive(false)}
+    >
+      <Typography variant="body1" style={pointerEventsStyle}>
+        Drag and drop .igc file here or
+      </Typography>
+      <FilePicker
+        accept=".igc"
+        multiple
+        style={pointerEventsStyle}
+        label={(
+          <>
+            select files
+            <CloudUploadIcon />
+          </>
+        )}
+        onChange={handleFilePicker}
+      />
+    </DropZone>
+  );
+};
 
 TrackSelector.defaultProps = {
   className: '',

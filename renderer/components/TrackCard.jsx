@@ -1,29 +1,39 @@
+import React, { useState } from 'react';
 import dynamic from 'next/dynamic';
-import React from 'react';
 import styled from 'styled-components';
 
 import BaseCard from '@material-ui/core/Card';
 import BaseCardContent from '@material-ui/core/CardContent';
+import BaseCardActions from '@material-ui/core/CardActions';
+import BaseButton from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 
-// import useParseIgc from '../hooks/use-parse-igc';
 
 const BaseTrackMap = dynamic(() => import("./TrackMap"), { ssr: false });
 
 const Card = styled(BaseCard)`
   display: flex;
-  margin-bottom: 30px;
+  margin-top: 30px;
 `;
 
 const CardContent = styled(BaseCardContent)`
-  min-width: 60%;
+  min-width: 250px;
+`;
+
+const CardActions = styled(BaseCardActions)`
 `;
 
 const TrackMap = styled(BaseTrackMap)`
-  /* max-width: 300px; */
-  max-height: 165px;
+  max-height: ${({ isOpen }) => isOpen ? '350px' : '165px'};
 `;
 
+const Button = styled(BaseButton)`
+  margin-top: 10px;
+
+  & + button {
+    margin-left: 5px;
+  }
+`;
 
 function toHHMMSS(secs) {
   var sec_num = parseInt(secs, 10); // don't forget the second param
@@ -37,10 +47,14 @@ function toHHMMSS(secs) {
   return hours+':'+minutes+':'+seconds;
 }
 
-export default function TrackCard({ trackId, date, duration, track }) {
-
-  console.log('track!', { track });
-
+export default function TrackCard({ 
+  trackId,
+  date,
+  duration,
+  track,
+  onRemove = () => undefined,
+}) {
+  const [isOpen, setIsOpen] = useState(false);
   return (
     <Card>
       <CardContent>
@@ -53,9 +67,25 @@ export default function TrackCard({ trackId, date, duration, track }) {
           Glider: {track.gliderType}<br />
           GPS points: {track.fixes.length}
         </Typography>
-      </CardContent>
 
+        <Button 
+          size="small"
+          variant="contained"
+          onClick={() => setIsOpen(!isOpen)}
+        >
+          {isOpen ? 'Reduce Map' : 'Enlarge Map'} 
+        </Button>
+        <Button 
+          size="small"
+          variant="contained"
+          color="secondary"
+          onClick={onRemove}
+        >
+          Remove
+        </Button>
+      </CardContent>
       <TrackMap
+        isOpen={isOpen}
         gpsTrack={track}
       />
     </Card>
