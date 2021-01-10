@@ -28,6 +28,8 @@ jobs:
         uses: samuelmeuli/action-electron-builder@v1
         env:
           CSC_IDENTITY_AUTO_DISCOVERY: false
+          NEXT_PUBLIC_MAP_TILER_KEY: ${{ secrets.NEXT_PUBLIC_MAP_TILER_KEY }}
+          NEXT_PUBLIC_MAP_TILER_GEO_KEY: ${{ secrets.NEXT_PUBLIC_MAP_TILER_GEO_KEY }}
         with:
           # GitHub token, automatically provided to the action
           # (No need to define this secret in the repo settings)
