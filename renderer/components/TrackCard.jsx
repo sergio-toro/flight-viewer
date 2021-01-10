@@ -2,8 +2,6 @@ import dynamic from 'next/dynamic';
 import React from 'react';
 import styled from 'styled-components';
 
-import formatDuration from 'date-fns/formatDuration';
-
 import BaseCard from '@material-ui/core/Card';
 import BaseCardContent from '@material-ui/core/CardContent';
 import Typography from '@material-ui/core/Typography';
@@ -39,7 +37,7 @@ function toHHMMSS(secs) {
   return hours+':'+minutes+':'+seconds;
 }
 
-export default function TrackCard({ date, duration, track }) {
+export default function TrackCard({ trackId, date, duration, track }) {
 
   console.log('track!', { track });
 
@@ -47,11 +45,12 @@ export default function TrackCard({ date, duration, track }) {
     <Card>
       <CardContent>
         <Typography gutterBottom variant="h6" component="h2">
-          Track: {date}
+          Track: {trackId}
         </Typography>
         <Typography gutterBottom variant="body2" component="p">
-          Glider: {track.gliderType}<br />
+          Date: {date}<br />
           Duration: {toHHMMSS(duration)}<br />
+          Glider: {track.gliderType}<br />
           GPS points: {track.fixes.length}
         </Typography>
       </CardContent>

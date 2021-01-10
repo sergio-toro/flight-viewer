@@ -15,16 +15,17 @@ export default function Home() {
           parsedTracks.forEach((track) => {
             trackListRef.current[track.trackId] = track;
           });
-          
+
           setTracks([...tracks, ...parsedTracks.map(({ trackId }) => trackId)]);
         }}
       />
 
-      {tracks && tracks.map((trackId) => {
+      {tracks && tracks.reverse().map((trackId) => {
         const item = trackListRef.current[trackId];
         return (
-          <TrackCard 
+          <TrackCard
             key={trackId}
+            trackId={item.trackId}
             date={item.date}
             duration={item.duration}
             track={item.track}

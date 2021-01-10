@@ -1,10 +1,6 @@
 import React, { Fragment } from 'react';
-import styled from 'styled-components';
 import { Button } from '@material-ui/core';
 
-const HiddenInput = styled.input`
-  display: none;
-`;
 
 // type Props = {
 //   onChange: Function,
@@ -12,24 +8,23 @@ const HiddenInput = styled.input`
 //   accept: string,
 //   label: React$Node
 // };
-
 const FilePicker = ({
-  className, 
   label,
   accept,
+  multiple = false,
   onChange,
-  ...props
 }) => (
   <>
-    <HiddenInput
+    <input
       accept={accept}
       id="outlined-button-file"
       type="file"
       onChange={onChange}
-      {...props}
+      multiple={multiple}
+      style={{ display: 'none' }}
     />
     <label htmlFor="outlined-button-file">
-      <Button className={className} color="primary" variant="outlined" component="span">
+      <Button color="primary" variant="contained" component="span">
         {label}
       </Button>
     </label>

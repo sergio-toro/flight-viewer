@@ -40,7 +40,7 @@ function parseFiles(files) {
         date: parsedTrack.date,
         duration: (endTimestamp - startTimestamp) / 1000,
       };
-    } 
+    }
     catch(error) {
       console.error(`FAILED to parse file ${file.name}`, error, file);
       return undefined;
