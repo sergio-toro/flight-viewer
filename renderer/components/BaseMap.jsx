@@ -6,7 +6,7 @@ import useMap from '../hooks/map/use-map';
 
 const Container = styled.div`
   width: 100%;
-  min-height: 200px;
+  height: 100%;
 `;
 
 // type Props = {

@@ -4,7 +4,6 @@ import styled from 'styled-components';
 
 import BaseCard from '@material-ui/core/Card';
 import BaseCardContent from '@material-ui/core/CardContent';
-import BaseCardActions from '@material-ui/core/CardActions';
 import BaseButton from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 
@@ -20,11 +19,9 @@ const CardContent = styled(BaseCardContent)`
   min-width: 250px;
 `;
 
-const CardActions = styled(BaseCardActions)`
-`;
-
 const TrackMap = styled(BaseTrackMap)`
-  max-height: ${({ isOpen }) => isOpen ? '350px' : '165px'};
+  width: calc(100% - 250px);
+  height: ${({ isOpen }) => isOpen ? '400px' : '200px'};
 `;
 
 const Button = styled(BaseButton)`
@@ -47,7 +44,7 @@ function toHHMMSS(secs) {
   return hours+':'+minutes+':'+seconds;
 }
 
-export default function TrackCard({ 
+export default function TrackCard({
   trackId,
   date,
   duration,
@@ -67,15 +64,7 @@ export default function TrackCard({
           Glider: {track.gliderType}<br />
           GPS points: {track.fixes.length}
         </Typography>
-
-        <Button 
-          size="small"
-          variant="contained"
-          onClick={() => setIsOpen(!isOpen)}
-        >
-          {isOpen ? 'Reduce Map' : 'Enlarge Map'} 
-        </Button>
-        <Button 
+        <Button
           size="small"
           variant="contained"
           color="secondary"
@@ -86,6 +75,7 @@ export default function TrackCard({
       </CardContent>
       <TrackMap
         isOpen={isOpen}
+        onChangeIsOpen={() => setIsOpen(!isOpen)}
         gpsTrack={track}
       />
     </Card>

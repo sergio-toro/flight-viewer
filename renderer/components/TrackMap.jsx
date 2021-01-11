@@ -1,21 +1,46 @@
 // @flow
-import React, { useMemo, useRef } from 'react';
+import React, { useMemo, useRef, useEffect } from 'react';
 import styled from 'styled-components';
 
+import BaseButton from '@material-ui/core/Button';
+
 import useFitBounds from '../hooks/map/use-fit-bounds';
-// import useRenderLaunches from '../hooks/map/useRenderLaunches';
-// import useRenderLandings from '../hooks/map/useRenderLandings';
 import useRenderPolyline from '../hooks/map/use-render-polyline';
 import useRenderMarker from '../hooks/map/use-render-marker';
+
+import calculateBounds from '../utils/map/calculate-bounds';
 
 import DefaultIcon from './map-icons/DefaultIcon';
 import LandingIcon from './map-icons/LandingIcon';
 
 import BaseMap from './BaseMap';
 
-const MapContainer = styled(BaseMap)`
+const Container = styled.div`
+  position: relative;
+  overflow: hidden;
+`;
+
+const Map = styled(BaseMap)`
+  outline: none;
   width: 100%;
-  height: 350px;
+  height: 100%;
+
+  z-index: 10;
+`;
+
+const MapActions = styled.div`
+  position: absolute;
+  top: 5px;
+  right: 5px;
+
+  z-index: 15;
+
+`;
+
+const Button = styled(BaseButton)`
+  & + button {
+    margin-left: 5px;
+  }
 `;
 
 // type PointShape = {
@@ -42,15 +67,9 @@ const MapContainer = styled(BaseMap)`
 const TrackMap = ({
   className,
   gpsTrack,
-  // launch,
-  // nearLaunches,
-  // onLaunchChange,
-  // landing,
-  // nearLandings,
-  // onLandingChange,
+  isOpen,
+  onChangeIsOpen,
 }) => {
-  // const selectedLaunchId = launch && launch.id;
-  // const selectedLandingId = landing && landing.id;
   const mapRef = useRef();
   const flightTrack = useMemo(() => {
     if (!gpsTrack || !gpsTrack.fixes) {
@@ -59,30 +78,52 @@ const TrackMap = ({
     return gpsTrack.fixes.map(point => {
       return [point.latitude, point.longitude];
     });
-  }, [JSON.stringify(gpsTrack)]); // eslint-disable-line react-hooks/exhaustive-deps
+}, [JSON.stringify(gpsTrack)]); // eslint-disable-line react-hooks/exhaustive-deps
+  const bounds = useMemo(() => calculateBounds(flightTrack), [flightTrack]);
 
-  useFitBounds(
-    mapRef,
-    // launch,
-    // nearLaunches,
-    // landing,
-    // nearLandings,
-    flightTrack,
-  );
   useRenderPolyline(mapRef, flightTrack);
   useRenderMarker(mapRef, flightTrack[0], DefaultIcon, 'Launch');
   useRenderMarker(mapRef, flightTrack[flightTrack.length - 1], LandingIcon, 'Landing');
 
+  useFitBounds(mapRef, flightTrack);
+
+  useEffect(() => {
+    const map = mapRef.current;
+
+    map.invalidateSize();
+    map.fitBounds(bounds, { padding: [10, 10] });
+  }, [isOpen])
+
   return (
-    <MapContainer
-      id="TrackMap"
-      className={className}
-      ref={mapRef}
-      initialCenter={
-        undefined
-        // (launch && launch.latlng) || (landing && landing.latlng) || undefined
-      }
-    />
+    <Container className={className}>
+      <MapActions>
+        <Button
+          size="small"
+          variant="contained"
+          onClick={() => {
+            const map = mapRef.current;
+
+            map.invalidateSize();
+            map.fitBounds(bounds, { padding: [10, 10] });
+          }}
+          >
+            Center
+        </Button>
+
+        <Button
+          size="small"
+          variant="contained"
+          onClick={onChangeIsOpen}
+        >
+          {isOpen ? 'Reduce Map' : 'Enlarge Map'}
+        </Button>
+      </MapActions>
+      <Map
+        id="TrackMap"
+        ref={mapRef}
+        initialCenter={undefined}
+      />
+    </Container>
   );
 };
 
